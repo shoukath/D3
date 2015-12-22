@@ -20,7 +20,6 @@ This project uses a number of open source projects to work properly:
 
 * [D3] - Interative data-visualization library
 * [Underscore.js] - Programming helper library
-* [Moment.js] - Date helper library
 
 License
 ----
@@ -33,4 +32,3 @@ MIT
 
    [Underscore.js]: <http://underscorejs.org/>
    [d3]: <http://d3js.org/>
-   [Moment.js]: <http://momentjs.com/>

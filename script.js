@@ -5,7 +5,9 @@ var createDataArray = function (data) {
 	var i;
 	for(i = 0; i < data.length; i++) {
 		// barData[data[i].timestamp] = (barData[data[i].timestamp] || 0) + Number(data[i]['disk_usage(MB)']);
-		var formattedDate = moment(data[i].timestamp, 'YYYY-MM-DD').format('D-MMM-YY');
+		var dateFormat = d3.time.format("%d-%b-%y")
+		// var formattedDate = moment(data[i].timestamp, 'YYYY-MM-DD').format('D-MMM-YY');
+		var formattedDate = dateFormat(new Date(data[i].timestamp));
 		var matchedData = _.where(barData, {date : formattedDate});
 		if ( matchedData.length ) {
 			matchedData[0].dataUsage = matchedData[0].dataUsage + Number(data[i]['disk_usage(MB)']);
@@ -19,12 +21,6 @@ var createDataArray = function (data) {
 };
 
 d3.csv('./data/cluster-disk-util.csv', function(data){
-	/*
-		[
-			{date}
-			"2012-06-01 04:03:38 PST": "2323"
-		]
-	*/
 	var margin = {top: 30, right: 30, bottom: 40, left: 50};
 
 	var height = 400 - margin.top - margin.bottom,
