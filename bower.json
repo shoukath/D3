@@ -1,0 +1,23 @@
+{
+  "name": "D3",
+  "version": "0.0.1",
+  "homepage": "https://github.com/shoukath/D3",
+  "authors": [
+    "shoukath@gmail.com"
+  ],
+  "description": "Data analysis and charting",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "d3": "~3.5.12",
+    "momentjs": "~2.10.6",
+    "underscore": "~1.8.3"
+  }
+}
