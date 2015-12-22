@@ -23,8 +23,10 @@ d3.csv('./data/cluster-disk-util.csv', function(data){
 			"2012-06-01 04:03:38 PST": "2323"
 		]
 	*/
-	var height = 200,
-		width  = 600,
+	var margin = {top: 30, right: 30, bottom: 40, left: 50};
+
+	var height = 200 - margin.top - margin.bottom,
+		width  = 600 - margin.left - margin.right,
 		barWidth = 50,
 		barOffset = 5,
 		yScale, xScale;
@@ -42,10 +44,11 @@ d3.csv('./data/cluster-disk-util.csv', function(data){
 				.rangeBands([0, width], .2);
 	
 	var clusterUsageChart = d3.select('#chart').append('svg')
-		.attr('width', width)
-		.attr('height', height)
-		.append('g')
 		// .style('background', 'gray')
+		.attr('width', width +  margin.top + margin.bottom)
+		.attr('height', height + margin.top + margin.bottom)
+		.append('g')
+		.attr('transform', 'translate('+margin.left+','+margin.top+')')
 		.selectAll('rect').data(barData)
 		.enter().append('rect')
 			.style('fill', '#C61C6F')
@@ -89,7 +92,7 @@ d3.csv('./data/cluster-disk-util.csv', function(data){
 	vGuide = d3.select('svg').append('g')
 	vAxis(vGuide);
 	vGuide
-		.attr('transform', 'translate(35, 10)')
+		.attr('transform', 'translate('+margin.left+','+margin.top+')')
 		.selectAll('path')
 			.style({fill: 'none', stroke: '#000'})
 	vGuide.selectAll('line')
@@ -103,7 +106,7 @@ d3.csv('./data/cluster-disk-util.csv', function(data){
 		}))
 	var hGuide = d3.select('svg').append('g');
 		hAxis(hGuide)
-		hGuide.attr('transform', 'translate(0, '+(height-30)+')')
+		hGuide.attr('transform', 'translate('+margin.left+','+(height + margin.top)+')')
 			.selectAll('path')
 				.style({fill: 'none', stroke: '#000'});
 		hGuide.selectAll('line')
