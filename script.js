@@ -2,7 +2,7 @@
 	'use strict'
 
 	var barData = [],
-		clusterMemoryUsageData, clusterLocationData
+		clusterMemoryUsageData, clusterLocationData,
 		margin = {top: 30, right: 30, bottom: 40, left: 50},
 		height = 400 - margin.top - margin.bottom,
 		width  = 600 - margin.left - margin.right,
@@ -149,5 +149,6 @@
 
 	d3.csv('./data/cluster-locations.csv', function(data){
 		clusterLocationData = data;
+		$('.dropdown-toggle').dropdown()
 	});
 })();
