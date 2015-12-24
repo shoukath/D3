@@ -6,8 +6,8 @@
 		barDataAllRegions,
 		groupedLocationData,
 		margin = {top: 30, right: 30, bottom: 40, left: 100},
-		height = 400 - margin.top - margin.bottom,
-		width  = 700 - margin.left - margin.right,
+		height = 500 - margin.top - margin.bottom,
+		width  = 900 - margin.left - margin.right,
 		yScale, xScale,
 		vAxis, vGuide, vGuideScale,
 		hAxis, hGuide,
@@ -64,7 +64,7 @@
 			});
 
 		svg = d3.select('#chart').append('svg')
-			.attr('width', width +  margin.top + margin.bottom)
+			.attr('width', width +  margin.left + margin.right)
 			.attr('height', height + margin.top + margin.bottom);
 		
 		clusterUsageChart = svg
