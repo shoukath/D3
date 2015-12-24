@@ -9,9 +9,10 @@ $ npm install -g bower
 ```
 
 ### Project setup
-Import the JS libraries
+Import the JS and Node libraries
 ```sh
 $ bower install
+$ npm install
 ```
 
 ### Tech
@@ -20,8 +21,9 @@ This project uses a number of open source projects to work properly:
 
 * [D3] - Interative data-visualization library
 * [Underscore.js] - Programming helper library
+* [Twitter Bootstrap] - great UI boilerplate for modern web apps
 
-License
+### License
 ----
 
 MIT
@@ -32,3 +34,4 @@ MIT
 
    [Underscore.js]: <http://underscorejs.org/>
    [d3]: <http://d3js.org/>
+   [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
