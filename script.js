@@ -5,31 +5,31 @@
 		clusterMemoryUsageData, clusterLocationData,
 		barDataAllRegions,
 		groupedLocationData,
-		margin = {top: 30, right: 30, bottom: 40, left: 100},
+		margin = {top: 30, right: 0, bottom: 100, left: 130},
 		height = 500 - margin.top - margin.bottom,
 		width  = 900 - margin.left - margin.right,
 		yScale, xScale,
 		vAxis, vGuide, vGuideScale,
 		hAxis, hGuide,
 		tooltip,
-		colors,// = d3.scale.category20c(),
+		colors,
 		svg, clusterUsageChart;
 
 	var createDataArray = function (data) {
 		barData = [];
-		for(var i = 0; i < data.length; i++) {
+		_.each(data, function(item){
 			var dateFormat = d3.time.format("%d-%b-%y");
-			var formattedDate = dateFormat(new Date(data[i].timestamp));
+			var formattedDate = dateFormat(new Date(item.timestamp));
 			var matchedData = _.where(barData, {date : formattedDate});
 			if ( matchedData.length ) {
-				matchedData[0].dataUsage = matchedData[0].dataUsage + Number(data[i]['disk_usage(MB)']);
+				matchedData[0].dataUsage = matchedData[0].dataUsage + Number(item['disk_usage(MB)']);
 			} else {
 				barData.push({
 					date : formattedDate,
-					dataUsage: Number(data[i]['disk_usage(MB)'])
+					dataUsage: Number(item['disk_usage(MB)'])
 				});
 			}
-		}
+		});
 	};
 
 	d3.csv('./data/cluster-disk-util.csv', function(data){
@@ -51,6 +51,7 @@
 						return d.dataUsage;
 					})])
 					.range([0, height]);
+
 		xScale = d3.scale.ordinal()
 					.domain(d3.range(0, barData.length))
 					.rangeBands([0, width], 0.2);
@@ -135,20 +136,50 @@
 				.style({fill: 'none', stroke: '#000'});
 		vGuide.selectAll('line')
 			.style({stroke: '#000'});
+		vGuide.append("text")
+			.attr("y", 0)
+			.attr("dy", "-7.5em")
+			.attr("x", -height/2)
+			.attr("transform", "rotate(-90)")
+			.style("text-anchor", "middle")
+			.text("Data Usage (MB)");
 
-		hAxis = d3.svg.axis()
+		/*hAxis = d3.svg.axis()
 			.scale(xScale)
 			.orient('bottom')
 			.tickValues(xScale.domain().filter(function(d,i) {
 				return i;
 			}));
 		hGuide = d3.select('svg').append('g');
-			hAxis(hGuide);
-			hGuide.attr('transform', 'translate('+margin.left+','+(height + margin.top)+')')
-				.selectAll('path')
-					.style({fill: 'none', stroke: '#000'});
-			hGuide.selectAll('line')
-				.style({stroke: '#000'});
+		hAxis(hGuide);
+		hGuide.attr('transform', 'translate('+margin.left+','+(height + margin.top)+')')
+			.selectAll('path')
+				.style({fill: 'none', stroke: '#000'});
+		hGuide.selectAll('line')
+			.style({stroke: '#000'});*/
+		hAxis = d3.svg.axis()
+				.scale(xScale)
+				.orient("bottom")
+				.tickFormat(function(d) {
+					return barData[d].date;
+				});
+		hGuide = svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", 'translate('+margin.left+','+(height + margin.top)+')');
+		hGuide
+			.call(hAxis)
+			.selectAll("text")
+				.style("text-anchor", "end")
+				.attr("dx", "-.8em")
+				.attr("dy", "-.55em")
+				.attr("transform", "rotate(-90)" );
+		
+		hGuide.append("text")
+			.attr("y", 100)
+			.attr("dy", "0")
+			.attr("x", width/2)
+			.style("text-anchor", "middle")
+			.text("Date");
 	});
 
 	var updateChart = function () {
@@ -176,7 +207,7 @@
 				return i * 20;
 			})
 			.duration(700)
-			.ease('quad');
+			.ease('circle');
 		
 		vGuideScale.domain([0, d3.max(barData, function(d) {
 			return d.dataUsage;
@@ -185,7 +216,7 @@
 		svg.select(".y.axis")
 			.transition()
 			.duration(700)
-			.ease("quad")
+			.ease("circle")
 			.call(vAxis);
 	};
 
