@@ -5,22 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>D3</title>
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
 </head>
 <body>
+	<header class="container">
+		<h1>Data analysis and charting</h1>
+	</header>
+
 	<div class="container">
+		<div class="dropdown pull-right">
+			<button id="dLabel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				All
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" aria-labelledby="dLabel">
+				<li><a href="#">All</a></li>
+			</ul>
+		</div>
 		<div id="chart"></div>
-	</div>
-	<div class="dropdown">
-		<button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			Dropdown trigger
-			<span class="caret"></span>
-		</button>
-		<ul class="dropdown-menu" aria-labelledby="dLabel">
-			<li>Hello</li>
-			<li>Hello</li>
-			<li>Hello</li>
-			<li>Hello</li>
-		</ul>
 	</div>
 
 	<!-- Essential Scripts -->

@@ -1,23 +1,24 @@
 (function() {
-	'use strict'
+	'use strict';
 
-	var barData = [],
+	var barData,
 		clusterMemoryUsageData, clusterLocationData,
-		margin = {top: 30, right: 30, bottom: 40, left: 50},
+		barDataAllRegions,
+		groupedLocationData,
+		margin = {top: 30, right: 30, bottom: 40, left: 100},
 		height = 400 - margin.top - margin.bottom,
-		width  = 600 - margin.left - margin.right,
+		width  = 700 - margin.left - margin.right,
 		yScale, xScale,
 		vAxis, vGuide, vGuideScale,
 		hAxis, hGuide,
 		tooltip,
+		colors,// = d3.scale.category20c(),
 		svg, clusterUsageChart;
 
 	var createDataArray = function (data) {
-		var i;
-		for(i = 0; i < data.length; i++) {
-			// barData[data[i].timestamp] = (barData[data[i].timestamp] || 0) + Number(data[i]['disk_usage(MB)']);
-			var dateFormat = d3.time.format("%d-%b-%y")
-			// var formattedDate = moment(data[i].timestamp, 'YYYY-MM-DD').format('D-MMM-YY');
+		barData = [];
+		for(var i = 0; i < data.length; i++) {
+			var dateFormat = d3.time.format("%d-%b-%y");
 			var formattedDate = dateFormat(new Date(data[i].timestamp));
 			var matchedData = _.where(barData, {date : formattedDate});
 			if ( matchedData.length ) {
@@ -37,7 +38,14 @@
 
 		createDataArray(clusterMemoryUsageData);
 
-		// barData = [10,12,30,15];
+		barDataAllRegions = barData;
+
+		colors = d3.scale.linear()
+					.domain([0, d3.max(barData, function(d) {
+						return d.dataUsage;
+					})])
+					.range(['#ffb832', '#c61c6f']);
+
 		yScale = d3.scale.linear()
 					.domain([0, d3.max(barData, function(d) {
 						return d.dataUsage;
@@ -64,19 +72,15 @@
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
 			.selectAll('rect').data(barData)
 			.enter().append('rect')
-				.style('fill', '#C61C6F')
-				.attr('width', xScale.rangeBand())
-				.attr('height', function(d) {
-					// return yScale(d.dataUsage);
-					return 0;
+				.style('fill', function(d, i) {
+					return "rgb(100, 200, " + (i * 10) + ")";
 				})
+				.attr('width', xScale.rangeBand())
+				.attr('height', 0)
 				.attr('x', function(d, i) {
 					return xScale(i);
 				})
-				.attr('y', function (d) {
-					// return height - yScale(d.dataUsage);
-					return height;
-				});
+				.attr('y', height);
 
 		clusterUsageChart.transition()
 			.attr('height', function(d) {
@@ -123,7 +127,7 @@
 			.orient('left')
 			.ticks(10);
 
-		vGuide = d3.select('svg').append('g');
+		vGuide = d3.select('svg').append('g').attr("class", "y axis");
 		vAxis(vGuide);
 		vGuide
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
@@ -147,8 +151,68 @@
 				.style({stroke: '#000'});
 	});
 
+	var updateChart = function () {
+		if ($(this).text() === 'All') {
+			barData = barDataAllRegions;
+		} else {
+			getUsageDataByLocation.call(this);
+		}
+
+		yScale
+			.domain([0, d3.max(barData, function(d) {
+				return d.dataUsage;
+			})]);
+			
+			
+		clusterUsageChart.data(barData).transition()
+			.attr('height', function(d) {
+				// console.log(yScale(d.dataUsage));
+				return yScale(d.dataUsage);
+			})
+			.attr('y', function (d) {
+				return height - yScale(d.dataUsage);
+			})
+			.delay(function(d, i) {
+				return i * 20;
+			})
+			.duration(700)
+			.ease('quad');
+		
+		vGuideScale.domain([0, d3.max(barData, function(d) {
+			return d.dataUsage;
+		})]);
+
+		svg.select(".y.axis")
+			.transition()
+			.duration(700)
+			.ease("quad")
+			.call(vAxis);
+	};
+
+	var getUsageDataByLocation = function() {
+		var listOfClusterIds = groupedLocationData[$(this).text()],
+			filteredByLocation = [];
+
+		_.each(listOfClusterIds, function(clusterObj){
+			var perClusterIdFilter = _.where(clusterMemoryUsageData, {cluster_id: clusterObj.cluster_id});
+			// filteredByLocation = _.union(filteredByLocation, perClusterIdFilter);
+			filteredByLocation = filteredByLocation.concat(perClusterIdFilter);
+		});
+		createDataArray(filteredByLocation);
+	};
+
 	d3.csv('./data/cluster-locations.csv', function(data){
 		clusterLocationData = data;
-		$('.dropdown-toggle').dropdown()
+
+		groupedLocationData = _(_.sortBy(clusterLocationData, 'country_code'))
+									.groupBy('country_code');
+
+		for(var key in groupedLocationData) {
+			$('<li>').html('<a href="#">'+key+'</a>')
+				.appendTo('.dropdown-menu')
+
+		}
+		$('.dropdown-toggle').dropdown();
+		$('.dropdown-menu li').click(updateChart);
 	});
 })();
