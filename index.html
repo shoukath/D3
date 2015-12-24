@@ -5,24 +5,28 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>D3</title>
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css
+	">
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<header class="container">
 		<h1 class="text-center">Data analysis and charting</h1>
 	</header>
 
-	<div class="container">
-		<div class="dropdown pull-right">
-			<button id="dLabel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				All
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" aria-labelledby="dLabel">
-				<li><a href="#">All</a></li>
-			</ul>
+	<div class="container text-center">
+		<div id="chartContainer">
+			<div class="dropdown pull-right">
+				<button id="dLabel" class="btn btn-primary glyphicon glyphicon-globe" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					All Regions
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dLabel">
+					<li><a href="#">All</a></li>
+				</ul>
+			</div>
+			<div id="chart"></div>
 		</div>
-		<div id="chart"></div>
 	</div>
 
 	<!-- Essential Scripts -->
