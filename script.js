@@ -6,6 +6,7 @@
 		clusterMemoryUsageData, clusterLocationData,
 		barDataAllRegions,
 		groupedLocationData,
+		maxData,
 		margin = {top: 30, right: 0, bottom: 100, left: 130},
 		height = 500 - margin.top - margin.bottom,
 		width  = 900 - margin.left - margin.right,
@@ -34,6 +35,12 @@
 		});
 	};
 
+	var getMaxData = function () {
+		d3.max(barData, function(d) {
+			maxData = d.dataUsage;
+		});
+	}
+
 	d3.csv('./data/cluster-disk-util.csv', function(data){
 
 		clusterMemoryUsageData = data;
@@ -42,16 +49,14 @@
 
 		barDataAllRegions = barData;
 
-		colors = d3.scale.linear()
-					.domain([0, d3.max(barData, function(d) {
-						return d.dataUsage;
-					})])
+		getMaxData();
+
+		colors = d3.scale.linear() // --> May be unuseful
+					.domain([0, maxData])
 					.range(['#ffb832', '#c61c6f']);
 
 		yScale = d3.scale.linear()
-					.domain([0, d3.max(barData, function(d) {
-						return d.dataUsage;
-					})])
+					.domain([0, maxData])
 					.range([0, height]);
 
 		xScale = d3.scale.ordinal()
@@ -120,9 +125,7 @@
 		});
 
 		vGuideScale = d3.scale.linear()
-			.domain([0, d3.max(barData, function(d) {
-				return d.dataUsage;
-			})])
+			.domain([0, maxData])
 			.range([height, 0]);
 
 		vAxis = d3.svg.axis()
@@ -200,11 +203,10 @@
 			getUsageDataByLocation.call(this);
 		}
 
+		getMaxData();
+
 		yScale
-			.domain([0, d3.max(barData, function(d) {
-				return d.dataUsage;
-			})]);
-			
+			.domain([0, maxData]);
 			
 		clusterUsageChart.data(barData).transition()
 			.attr('height', function(d) {
@@ -219,9 +221,7 @@
 			.duration(700)
 			.ease('circle');
 		
-		vGuideScale.domain([0, d3.max(barData, function(d) {
-			return d.dataUsage;
-		})]);
+		vGuideScale.domain([0, maxData]);
 
 		svg.select('.y.axis')
 			.transition()
