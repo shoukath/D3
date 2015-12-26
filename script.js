@@ -176,10 +176,13 @@
 		
 		hGuide.append("text")
 			.attr("y", 100)
-			.attr("dy", "0")
 			.attr("x", width/2)
 			.style("text-anchor", "middle")
 			.text("Date");
+		hGuide.selectAll('path')
+			.style({fill: 'none', stroke: '#000'});
+		hGuide.selectAll('line')
+			.style({stroke: '#000'});
 	});
 
 	var updateChart = function () {
