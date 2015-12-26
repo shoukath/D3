@@ -200,7 +200,6 @@
 			
 		clusterUsageChart.data(barData).transition()
 			.attr('height', function(d) {
-				// console.log(yScale(d.dataUsage));
 				return yScale(d.dataUsage);
 			})
 			.attr('y', function (d) {
@@ -227,11 +226,12 @@
 		var listOfClusterIds = groupedLocationData[$(this).text()],
 			filteredByLocation = [];
 
-		_.each(listOfClusterIds, function(clusterObj){
-			var perClusterIdFilter = _.where(clusterMemoryUsageData, {cluster_id: clusterObj.cluster_id});
-			// filteredByLocation = _.union(filteredByLocation, perClusterIdFilter);
-			filteredByLocation = filteredByLocation.concat(perClusterIdFilter);
+		_.each(clusterMemoryUsageData, function(clusterObj) {
+			if (_.contains(listOfClusterIds, clusterObj.cluster_id)) {
+				filteredByLocation.push(clusterObj);
+			}
 		});
+
 		createDataArray(filteredByLocation);
 	};
 
@@ -242,10 +242,12 @@
 									.groupBy('country_code');
 
 		for(var key in groupedLocationData) {
+			groupedLocationData[key] = _.pluck(groupedLocationData[key], 'cluster_id')
+
 			$('<li>').html('<a href="#">'+key+'</a>')
 				.appendTo('.dropdown-menu')
-
 		}
+
 		$('.dropdown-toggle').dropdown();
 		$('.dropdown-menu li').click(updateChart);
 	});
