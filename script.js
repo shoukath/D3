@@ -83,12 +83,14 @@
 				.style('fill', function(d, i) {
 					return 'rgb(100, 200, ' + (i * 10) + ')';
 				})
-				.attr('width', xScale.rangeBand())
-				.attr('height', 0)
-				.attr('x', function(d, i) {
-					return xScale(i);
-				})
-				.attr('y', height);
+				.attr({
+					'width': xScale.rangeBand(),
+					'height': 0,
+					'x': function(d, i) {
+						return xScale(i);
+					},
+					'y': height
+				});
 
 		clusterUsageChart.transition()
 			.attr('height', function(d) {
@@ -135,11 +137,12 @@
 		vGuide.selectAll('line')
 			.style({stroke: '#000'});
 		vGuide.append('text')
-			.attr('y', 0)
-			.attr('dy', '-7.5em')
-			.attr('x', -height/2)
-			.attr('transform', 'rotate(-90)')
-			// .attr('class', 'label')
+			.attr({
+				'y': 0,
+				'dy': '-7.5em',
+				'x': -height/2,
+				'transform': 'rotate(-90)'
+			})
 			.style('text-anchor', 'middle')
 			.style('font-weight', 'bold')
 			.text('Data Usage (MB)');
