@@ -41,6 +41,13 @@
 		});
 	}
 
+	tooltip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-10, 0])
+		.html(function(d) {
+			return ("<strong>Date:</strong> <span>"+d.date+"</span></br><strong>Data Usage:</strong> <span>"+d.dataUsage+"</span>");
+	});
+
 	d3.csv('./data/cluster-disk-util.csv', function(data){
 
 		clusterMemoryUsageData = data;
@@ -63,17 +70,10 @@
 					.domain(d3.range(0, barData.length))
 					.rangeBands([0, width], 0.2);
 
-		tooltip = d3.select('body').append('div')
-			.style({
-				position: 'absolute',
-				padding: '0 10px',
-				background: 'gray',
-				opacity: 0
-			});
-
 		svg = d3.select('#chart').append('svg')
 			.attr('width', width +  margin.left + margin.right)
-			.attr('height', height + margin.top + margin.bottom);
+			.attr('height', height + margin.top + margin.bottom)
+			.call(tooltip);
 		
 		clusterUsageChart = svg
 			.append('g')
@@ -105,23 +105,16 @@
 
 		clusterUsageChart
 		.on('mouseover', function(d) {
-			tooltip.transition()
-				.style('opacity', 0.9);
-
-			tooltip.html(d.dataUsage + '</br>' + d.date)
-				.style({
-					left: d3.event.pageX + 'px',
-					top: d3.event.pageY + 'px'
-				});
+			tooltip.show(d);
 
 			d3.select(this)
 				.style('opacity', 0.5);
 		})
 		.on('mouseout', function() {
+			tooltip.hide();
+
 			d3.select(this)
 				.style('opacity', 1);
-
-			tooltip.style('opacity', 0);
 		});
 
 		vGuideScale = d3.scale.linear()
