@@ -189,7 +189,7 @@
 	});
 
 	var updateChart = function () {
-		if ($(this).text() === 'All') {
+		if ($(this).text() === 'All Regions') {
 			barData = barDataAllRegions;
 		} else {
 			getUsageDataByLocation.call(this);
@@ -223,6 +223,8 @@
 			.duration(700)
 			.ease("circle")
 			.call(vAxis);
+
+		$('.dropdown #dropdown-label').text($(this).text());
 	};
 
 	var getUsageDataByLocation = function() {

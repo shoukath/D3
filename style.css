@@ -1,3 +1,10 @@
 #chartContainer {
 	display: inline-block;
 }
+
+#dropdown-label {
+	display: inline-block;
+	text-align: left;
+	width: 75px;
+	word-spacing: -10px;
+}
