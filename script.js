@@ -1,5 +1,6 @@
 (function() {
 	'use strict';
+	/* globals $, _, d3, moment */
 
 	var barData,
 		clusterMemoryUsageData, clusterLocationData,
@@ -19,8 +20,7 @@
 		barData = [];
 
 		_.each(data, function(item){
-			var dateFormat = d3.time.format("%d-%b-%y"),
-				formattedDate = moment(item.timestamp, 'YYYY-MM-DD').format('D-MMM-YY'),
+			var formattedDate = moment(item.timestamp, 'YYYY-MM-DD').format('D-MMM-YY'),
 				matchedData = _.where(barData, {date : formattedDate});
 
 			if ( matchedData.length ) {
@@ -76,7 +76,7 @@
 			.selectAll('rect').data(barData)
 			.enter().append('rect')
 				.style('fill', function(d, i) {
-					return "rgb(100, 200, " + (i * 10) + ")";
+					return 'rgb(100, 200, ' + (i * 10) + ')';
 				})
 				.attr('width', xScale.rangeBand())
 				.attr('height', 0)
@@ -130,7 +130,7 @@
 			.orient('left')
 			.ticks(10);
 
-		vGuide = d3.select('svg').append('g').attr("class", "y axis");
+		vGuide = d3.select('svg').append('g').attr('class', 'y axis');
 		vAxis(vGuide);
 		vGuide
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
@@ -138,13 +138,15 @@
 				.style({fill: 'none', stroke: '#000'});
 		vGuide.selectAll('line')
 			.style({stroke: '#000'});
-		vGuide.append("text")
-			.attr("y", 0)
-			.attr("dy", "-7.5em")
-			.attr("x", -height/2)
-			.attr("transform", "rotate(-90)")
-			.style("text-anchor", "middle")
-			.text("Data Usage (MB)");
+		vGuide.append('text')
+			.attr('y', 0)
+			.attr('dy', '-7.5em')
+			.attr('x', -height/2)
+			.attr('transform', 'rotate(-90)')
+			// .attr('class', 'label')
+			.style('text-anchor', 'middle')
+			.style('font-weight', 'bold')
+			.text('Data Usage (MB)');
 
 		/*hAxis = d3.svg.axis()
 			.scale(xScale)
@@ -161,26 +163,27 @@
 			.style({stroke: '#000'});*/
 		hAxis = d3.svg.axis()
 				.scale(xScale)
-				.orient("bottom")
+				.orient('bottom')
 				.tickFormat(function(d) {
 					return barData[d].date;
 				});
-		hGuide = svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", 'translate('+margin.left+','+(height + margin.top)+')');
+		hGuide = svg.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', 'translate('+margin.left+','+(height + margin.top)+')');
 		hGuide
 			.call(hAxis)
-			.selectAll("text")
-				.style("text-anchor", "end")
-				.attr("dx", "-.8em")
-				.attr("dy", "-.55em")
-				.attr("transform", "rotate(-90)" );
+			.selectAll('text')
+				.style('text-anchor', 'end')
+				.attr('dx', '-.8em')
+				.attr('dy', '-.55em')
+				.attr('transform', 'rotate(-90)' );
 		
-		hGuide.append("text")
-			.attr("y", 100)
-			.attr("x", width/2)
-			.style("text-anchor", "middle")
-			.text("Date");
+		hGuide.append('text')
+			.attr('y', 100)
+			.attr('x', width/2)
+			.style('text-anchor', 'middle')
+			.style('font-weight', 'bold')
+			.text('Date');
 		hGuide.selectAll('path')
 			.style({fill: 'none', stroke: '#000'});
 		hGuide.selectAll('line')
@@ -220,10 +223,10 @@
 			return d.dataUsage;
 		})]);
 
-		svg.select(".y.axis")
+		svg.select('.y.axis')
 			.transition()
 			.duration(700)
-			.ease("circle")
+			.ease('circle')
 			.call(vAxis);
 
 		$('.dropdown #dropdown-label').text($(this).text());
@@ -249,10 +252,12 @@
 									.groupBy('country_code');
 
 		for(var key in groupedLocationData) {
-			groupedLocationData[key] = _.pluck(groupedLocationData[key], 'cluster_id')
+			if (groupedLocationData.hasOwnProperty(key)) {
+				groupedLocationData[key] = _.pluck(groupedLocationData[key], 'cluster_id');
 
-			$('<li>').html('<a href="#">'+key+'</a>')
-				.appendTo('.dropdown-menu')
+				$('<li>').html('<a href="#">'+key+'</a>')
+					.appendTo('.dropdown-menu');
+			}
 		}
 
 		$('.dropdown-toggle').dropdown();
