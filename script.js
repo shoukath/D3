@@ -17,10 +17,12 @@
 
 	var createDataArray = function (data) {
 		barData = [];
+
 		_.each(data, function(item){
-			var dateFormat = d3.time.format("%d-%b-%y");
-			var formattedDate = dateFormat(new Date(item.timestamp));
-			var matchedData = _.where(barData, {date : formattedDate});
+			var dateFormat = d3.time.format("%d-%b-%y"),
+				formattedDate = moment(item.timestamp, 'YYYY-MM-DD').format('D-MMM-YY'),
+				matchedData = _.where(barData, {date : formattedDate});
+
 			if ( matchedData.length ) {
 				matchedData[0].dataUsage = matchedData[0].dataUsage + Number(item['disk_usage(MB)']);
 			} else {

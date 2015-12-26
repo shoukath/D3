@@ -19,5 +19,8 @@
     "d3": "~3.5.12",
     "underscore": "~1.8.3",
     "bootstrap": "~3.3.6"
+  },
+  "dependencies": {
+    "momentjs": "~2.10.6"
   }
 }
