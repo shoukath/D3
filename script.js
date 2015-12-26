@@ -183,6 +183,9 @@
 			.style({fill: 'none', stroke: '#000'});
 		hGuide.selectAll('line')
 			.style({stroke: '#000'});
+
+
+		$('.dropdown').removeClass('invisible');
 	});
 
 	var updateChart = function () {
@@ -250,5 +253,6 @@
 
 		$('.dropdown-toggle').dropdown();
 		$('.dropdown-menu li').click(updateChart);
+
 	});
 })();
