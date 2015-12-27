@@ -35,11 +35,24 @@
 		});
 	};
 
+	var getUsageDataByLocation = function() {
+		var listOfClusterIds = groupedLocationData[$(this).text()],
+			filteredByLocation = [];
+
+		_.each(clusterMemoryUsageData, function(clusterObj) {
+			if (_.contains(listOfClusterIds, clusterObj.cluster_id)) {
+				filteredByLocation.push(clusterObj);
+			}
+		});
+
+		createDataArray(filteredByLocation);
+	};
+
 	var getMaxData = function () {
 		d3.max(barData, function(d) {
 			maxData = d.dataUsage;
 		});
-	}
+	};
 
 	tooltip = d3.tip()
 		.attr('class', 'd3-tip')
@@ -60,7 +73,7 @@
 
 		colors = d3.scale.linear() // --> May be unuseful
 					.domain([0, maxData])
-					.range(['#ffb832', '#c61c6f']);
+					.range(['#0C4F9E', '#AED137']);
 
 		yScale = d3.scale.linear()
 					.domain([0, maxData])
@@ -188,7 +201,6 @@
 		hGuide.selectAll('line')
 			.style({stroke: '#000'});
 
-
 		$('.dropdown').removeClass('invisible');
 	});
 
@@ -201,8 +213,7 @@
 
 		getMaxData();
 
-		yScale
-			.domain([0, maxData]);
+		yScale.domain([0, maxData]);
 			
 		clusterUsageChart.data(barData).transition()
 			.attr('height', function(d) {
@@ -226,19 +237,6 @@
 			.call(vAxis);
 
 		$('.dropdown #dropdown-label').text($(this).text());
-	};
-
-	var getUsageDataByLocation = function() {
-		var listOfClusterIds = groupedLocationData[$(this).text()],
-			filteredByLocation = [];
-
-		_.each(clusterMemoryUsageData, function(clusterObj) {
-			if (_.contains(listOfClusterIds, clusterObj.cluster_id)) {
-				filteredByLocation.push(clusterObj);
-			}
-		});
-
-		createDataArray(filteredByLocation);
 	};
 
 	d3.csv('./data/cluster-locations.csv', function(data){
