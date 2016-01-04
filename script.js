@@ -21,9 +21,10 @@ Author: Shoukath
 		hAxis, hGuide,
 		tooltip,
 		colors,
+		radius = 4,
 		svg, clusterUsageChart;
 
-	/* This function processes the cluster usage data to sum up the data usage per day and 
+	/* This function processes the cluster usage data to sum up the data usage per day and
 	formats it to be ready and charted by D3 */
 	var createDataArray = function (data) {
 		lineData = [];
@@ -45,7 +46,7 @@ Author: Shoukath
 		});
 	};
 
-	/* Filters data usage by regions from the raw data usage file and sends it to 'createDataArray' 
+	/* Filters data usage by regions from the raw data usage file and sends it to 'createDataArray'
 	function to format it to be read by D3 */
 	var getUsageDataByLocation = function() {
 		var listOfClusterIds = groupedLocationData[$(this).text()],
@@ -69,7 +70,7 @@ Author: Shoukath
 			return ("<strong>Date:</strong> <span>"+d.date+"</span></br><strong>Data Usage:</strong> <span>"+d.dataUsage+"</span>");
 	});
 
-	var area, path, line, lineFunc;
+	var area, path, line, lineFunc, pt;
 
 	d3.csv('./data/cluster-disk-util.csv', function(data){
 
@@ -98,29 +99,29 @@ Author: Shoukath
 					.domain(d3.range(0, lineData.length))
 					.rangePoints([0, width]);
 		// xScale = d3.time.scale()
-		// 			.range([0, width])
+		//          .range([0, width])
 
 		svg = d3.select('#chart').append('svg')
 			.attr('width', width +  margin.left + margin.right)
 			.attr('height', height + margin.top + margin.bottom)
-			// .call(tooltip);
+			.call(tooltip);
 		area = d3.svg.area()
-			.interpolate("basis")
-			.x(function(d, i) { 
-				return xScale(i) + margin.left; 
+			// .interpolate("basis")
+			.x(function(d, i) {
+				return xScale(i) + margin.left;
 			})
-			.y0(function(d) { 
-				return height - yScale(d.dataUsage) + margin.top; 
+			.y0(function(d) {
+				return height - yScale(d.dataUsage) + margin.top;
 			})
 			.y1(height+ margin.top);
 
 		lineFunc = d3.svg.line()
-			.interpolate("basis")
-	        .x(function(d, i) { 
-				return xScale(i) + margin.left; 
+			// .interpolate("basis")
+			.x(function(d, i) {
+				return xScale(i) + margin.left;
 			})
-	        .y(function(d) { 
-				return height - yScale(d.dataUsage) + margin.top; 
+			.y(function(d) {
+				return height - yScale(d.dataUsage) + margin.top;
 			});
 
 		path = svg.append("path")
@@ -131,10 +132,41 @@ Author: Shoukath
 			.datum(lineData)
 			.attr("class", "line")
 			.attr("d", lineFunc);
+
+		pt = svg.selectAll(".pt")
+			.data(lineData)
+			.enter().append("g")
+			.attr("class", "pt")
+			.attr("transform", function(d, i) {
+				return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")"
+			});
+
+		pt.append("circle")
+			.attr("cx", 0)
+			.attr("cy", 0)
+			.attr("r", radius)
+			.attr("opacity", .5)
+			.attr("fill", "#B1C095")
+			.on('mouseover', function(d) {
+				tooltip.show(d);
+
+				d3.select(this)
+					.transition()
+					.style('opacity', 0.5)
+					.attr('r', 10);
+			})
+			.on('mouseout', function() {
+				tooltip.hide();
+
+				d3.select(this)
+					.transition()
+					.style('opacity', 1)
+					.attr('r', radius);
+			});
 			// .transition()
-			// 	.attr("d", area)
-			// 	.duration(2500)
-			// 	.ease('elastic');
+			//  .attr("d", area)
+			//  .duration(2500)
+			//  .ease('elastic');
 
 		/*clusterUsageChart = svg
 			.append('g')
@@ -166,7 +198,7 @@ Author: Shoukath
 			.duration(1000)
 			.ease('elastic');*/
 
-/*		clusterUsageChart
+/*      clusterUsageChart
 			.on('mouseover', function(d) {
 				tooltip.show(d);
 
@@ -238,7 +270,7 @@ Author: Shoukath
 				.attr('dx', '-.8em')
 				.attr('dy', '-.55em')
 				.attr('transform', 'rotate(-90)' );
-		
+
 		hGuide.append('text')
 			.attr('y', 100)
 			.attr('x', width/2)
@@ -265,7 +297,7 @@ Author: Shoukath
 		yScale.domain([0, d3.max(lineData, function(d) {
 			return d.dataUsage;
 		})]);
-			
+
 		/*clusterUsageChart.data(lineData).transition()
 			.attr('height', function(d) {
 				return yScale(d.dataUsage);
@@ -288,7 +320,15 @@ Author: Shoukath
 				.attr("d", lineFunc)
 				.duration(easeDuration)
 				.ease(easyType);
-		
+
+		pt.data(lineData)
+			.transition()
+			.attr("transform", function(d, i) {
+				return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")"
+			})
+			.duration(easeDuration)
+			.ease(easyType);
+
 		vGuideScale.domain([0, d3.max(lineData, function(d) {
 			return d.dataUsage;
 		})]);
@@ -321,4 +361,5 @@ Author: Shoukath
 		$('.dropdown-menu li').click(updateChart);
 
 	});
+
 })();
