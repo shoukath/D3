@@ -1,7 +1,13 @@
+/*
+Data analysis and charting
+Charting Cluters data usage over a period of time.
+Author: Shoukath
+*/
 (function() {
 	'use strict';
 	/* globals $, _, d3, moment */
 
+	/* Declaring the variables */
 	var barData,
 		clusterMemoryUsageData, clusterLocationData,
 		barDataAllRegions,
@@ -17,9 +23,12 @@
 		colors,
 		svg, clusterUsageChart;
 
+	/* This function processes the cluster usage data to sum up the data usage per day and 
+	formats it to be ready and charted by D3 */
 	var createDataArray = function (data) {
 		barData = [];
 
+		/* Looping through the entire data set to sum up the data usage */
 		_.each(data, function(item){
 			var formattedDate = moment(item.timestamp, 'YYYY-MM-DD').format('D-MMM-YY'),
 				matchedData = _.where(barData, {date : formattedDate});
@@ -35,6 +44,8 @@
 		});
 	};
 
+	/* Filters data usage by regions from the raw data usage file and sends it to 'createDataArray' 
+	function to format it to be read by D3 */
 	var getUsageDataByLocation = function() {
 		var listOfClusterIds = groupedLocationData[$(this).text()],
 			filteredByLocation = [];
@@ -48,18 +59,16 @@
 		createDataArray(filteredByLocation);
 	};
 
-	var getMaxData = function () {
-		d3.max(barData, function(d) {
-			maxData = d.dataUsage;
-		});
-	};
 
+	/* Creating a tooltip for the bar chart */
 	tooltip = d3.tip()
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
 			return ("<strong>Date:</strong> <span>"+d.date+"</span></br><strong>Data Usage:</strong> <span>"+d.dataUsage+"</span>");
 	});
+
+	var area, path, line, lineFunc;
 
 	d3.csv('./data/cluster-disk-util.csv', function(data){
 
@@ -69,26 +78,64 @@
 
 		barDataAllRegions = barData;
 
-		getMaxData();
+		// getMaxData();
+
 
 		colors = d3.scale.linear() // --> May be unuseful
-					.domain([0, maxData])
+					.domain([0, d3.max(barData, function(d) {
+						return d.dataUsage;
+					})])
 					.range(['#0C4F9E', '#AED137']);
 
 		yScale = d3.scale.linear()
-					.domain([0, maxData])
+					.domain([0, d3.max(barData, function(d) {
+						return d.dataUsage;
+					})])
 					.range([0, height]);
 
 		xScale = d3.scale.ordinal()
 					.domain(d3.range(0, barData.length))
-					.rangeBands([0, width], 0.2);
+					.rangeBands([0, width]);
+		// xScale = d3.time.scale()
+		// 			.range([0, width])
 
 		svg = d3.select('#chart').append('svg')
 			.attr('width', width +  margin.left + margin.right)
 			.attr('height', height + margin.top + margin.bottom)
-			.call(tooltip);
-		
-		clusterUsageChart = svg
+			// .call(tooltip);
+		area = d3.svg.area()
+			.interpolate("basis")
+			.x(function(d, i) { 
+				return xScale(i) + margin.left; 
+			})
+			.y0(function(d) { 
+				return height - yScale(d.dataUsage) + margin.top; 
+			})
+			.y1(height+ margin.top);
+
+		lineFunc = d3.svg.line()
+			.interpolate("basis")
+	        .x(function(d, i) { 
+				return xScale(i) + margin.left; 
+			})
+	        .y(function(d) { 
+				return height - yScale(d.dataUsage) + margin.top; 
+			});
+
+		path = svg.append("path")
+			.datum(barData)
+			.attr("class", "area")
+			.attr("d", area);
+		line = svg.append("path")
+			.datum(barData)
+			.attr("class", "line")
+			.attr("d", lineFunc);
+			// .transition()
+			// 	.attr("d", area)
+			// 	.duration(2500)
+			// 	.ease('elastic');
+
+		/*clusterUsageChart = svg
 			.append('g')
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
 			.selectAll('rect').data(barData)
@@ -103,9 +150,9 @@
 						return xScale(i);
 					},
 					'y': height
-				});
+				});*/
 
-		clusterUsageChart.transition()
+		/*clusterUsageChart.transition()
 			.attr('height', function(d) {
 				return yScale(d.dataUsage);
 			})
@@ -116,24 +163,26 @@
 				return i * 20;
 			})
 			.duration(1000)
-			.ease('elastic');
+			.ease('elastic');*/
 
-		clusterUsageChart
-		.on('mouseover', function(d) {
-			tooltip.show(d);
+/*		clusterUsageChart
+			.on('mouseover', function(d) {
+				tooltip.show(d);
 
-			d3.select(this)
-				.style('opacity', 0.5);
-		})
-		.on('mouseout', function() {
-			tooltip.hide();
+				d3.select(this)
+					.style('opacity', 0.5);
+			})
+			.on('mouseout', function() {
+				tooltip.hide();
 
-			d3.select(this)
-				.style('opacity', 1);
-		});
-
+				d3.select(this)
+					.style('opacity', 1);
+			});
+*/
 		vGuideScale = d3.scale.linear()
-			.domain([0, maxData])
+			.domain([0, d3.max(barData, function(d) {
+				return d.dataUsage;
+			})])
 			.range([height, 0]);
 
 		vAxis = d3.svg.axis()
@@ -145,8 +194,7 @@
 		vAxis(vGuide);
 		vGuide
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
-			.selectAll('path')
-				.style({fill: 'none', stroke: '#000'});
+			.selectAll('path');
 		vGuide.selectAll('line')
 			.style({stroke: '#000'});
 		vGuide.append('text')
@@ -196,8 +244,7 @@
 			.style('text-anchor', 'middle')
 			.style('font-weight', 'bold')
 			.text('Date');
-		hGuide.selectAll('path')
-			.style({fill: 'none', stroke: '#000'});
+		hGuide.selectAll('path');
 		hGuide.selectAll('line')
 			.style({stroke: '#000'});
 
@@ -205,17 +252,20 @@
 	});
 
 	var updateChart = function () {
+		var easyType = 'linear', easeDuration = 1000;
 		if ($(this).text() === 'All Regions') {
 			barData = barDataAllRegions;
 		} else {
 			getUsageDataByLocation.call(this);
 		}
 
-		getMaxData();
+		// getMaxData();
 
-		yScale.domain([0, maxData]);
+		yScale.domain([0, d3.max(barData, function(d) {
+			return d.dataUsage;
+		})]);
 			
-		clusterUsageChart.data(barData).transition()
+		/*clusterUsageChart.data(barData).transition()
 			.attr('height', function(d) {
 				return yScale(d.dataUsage);
 			})
@@ -226,14 +276,26 @@
 				return i * 20;
 			})
 			.duration(700)
-			.ease('circle');
+			.ease('circle');*/
+		path.datum(barData)
+			.transition()
+				.attr("d", area)
+				.duration(easeDuration)
+				.ease(easyType);
+		line.datum(barData)
+			.transition()
+				.attr("d", lineFunc)
+				.duration(easeDuration)
+				.ease(easyType);
 		
-		vGuideScale.domain([0, maxData]);
+		vGuideScale.domain([0, d3.max(barData, function(d) {
+			return d.dataUsage;
+		})]);
 
 		svg.select('.y.axis')
 			.transition()
-			.duration(700)
-			.ease('circle')
+			.duration(easeDuration)
+			.ease(easyType)
 			.call(vAxis);
 
 		$('.dropdown #dropdown-label').text($(this).text());

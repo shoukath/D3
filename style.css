@@ -45,3 +45,24 @@
 	line-height: 18px;
 	vertical-align: middle;
 }
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #5B6268;
+  shape-rendering: crispEdges;
+}
+.axis text {
+  fill: #5B6268;
+}
+
+.area {
+  fill: #E8EFDF;
+}
+
+.line {
+	fill: none;
+	stroke: #B1C095;
+	shape-rendering: crispEdges;
+}
