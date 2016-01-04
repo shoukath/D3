@@ -8,12 +8,12 @@ Author: Shoukath
 	/* globals $, _, d3, moment */
 
 	/* Declaring the variables */
-	var barData,
+	var lineData,
 		clusterMemoryUsageData, clusterLocationData,
-		barDataAllRegions,
+		lineDataAllRegions,
 		groupedLocationData,
 		maxData,
-		margin = {top: 30, right: 0, bottom: 100, left: 130},
+		margin = {top: 30, right: 10, bottom: 100, left: 130},
 		height = 500 - margin.top - margin.bottom,
 		width  = 900 - margin.left - margin.right,
 		yScale, xScale,
@@ -26,17 +26,18 @@ Author: Shoukath
 	/* This function processes the cluster usage data to sum up the data usage per day and 
 	formats it to be ready and charted by D3 */
 	var createDataArray = function (data) {
-		barData = [];
+		lineData = [];
 
 		/* Looping through the entire data set to sum up the data usage */
 		_.each(data, function(item){
+			var parseDate = d3.time.format("%d-%b-%y").parse;
 			var formattedDate = moment(item.timestamp, 'YYYY-MM-DD').format('D-MMM-YY'),
-				matchedData = _.where(barData, {date : formattedDate});
+				matchedData = _.where(lineData, {date : formattedDate});
 
 			if ( matchedData.length ) {
 				matchedData[0].dataUsage = matchedData[0].dataUsage + Number(item['disk_usage(MB)']);
 			} else {
-				barData.push({
+				lineData.push({
 					date : formattedDate,
 					dataUsage: Number(item['disk_usage(MB)'])
 				});
@@ -76,26 +77,26 @@ Author: Shoukath
 
 		createDataArray(clusterMemoryUsageData);
 
-		barDataAllRegions = barData;
+		lineDataAllRegions = lineData;
 
 		// getMaxData();
 
 
 		colors = d3.scale.linear() // --> May be unuseful
-					.domain([0, d3.max(barData, function(d) {
+					.domain([0, d3.max(lineData, function(d) {
 						return d.dataUsage;
 					})])
 					.range(['#0C4F9E', '#AED137']);
 
 		yScale = d3.scale.linear()
-					.domain([0, d3.max(barData, function(d) {
+					.domain([0, d3.max(lineData, function(d) {
 						return d.dataUsage;
 					})])
 					.range([0, height]);
 
 		xScale = d3.scale.ordinal()
-					.domain(d3.range(0, barData.length))
-					.rangeBands([0, width]);
+					.domain(d3.range(0, lineData.length))
+					.rangePoints([0, width]);
 		// xScale = d3.time.scale()
 		// 			.range([0, width])
 
@@ -123,11 +124,11 @@ Author: Shoukath
 			});
 
 		path = svg.append("path")
-			.datum(barData)
+			.datum(lineData)
 			.attr("class", "area")
 			.attr("d", area);
 		line = svg.append("path")
-			.datum(barData)
+			.datum(lineData)
 			.attr("class", "line")
 			.attr("d", lineFunc);
 			// .transition()
@@ -138,7 +139,7 @@ Author: Shoukath
 		/*clusterUsageChart = svg
 			.append('g')
 			.attr('transform', 'translate('+margin.left+','+margin.top+')')
-			.selectAll('rect').data(barData)
+			.selectAll('rect').data(lineData)
 			.enter().append('rect')
 				.style('fill', function(d, i) {
 					return 'rgb(100, 200, ' + (i * 10) + ')';
@@ -180,7 +181,7 @@ Author: Shoukath
 			});
 */
 		vGuideScale = d3.scale.linear()
-			.domain([0, d3.max(barData, function(d) {
+			.domain([0, d3.max(lineData, function(d) {
 				return d.dataUsage;
 			})])
 			.range([height, 0]);
@@ -225,7 +226,7 @@ Author: Shoukath
 				.scale(xScale)
 				.orient('bottom')
 				.tickFormat(function(d) {
-					return barData[d].date;
+					return lineData[d].date;
 				});
 		hGuide = svg.append('g')
 			.attr('class', 'x axis')
@@ -254,18 +255,18 @@ Author: Shoukath
 	var updateChart = function () {
 		var easyType = 'linear', easeDuration = 1000;
 		if ($(this).text() === 'All Regions') {
-			barData = barDataAllRegions;
+			lineData = lineDataAllRegions;
 		} else {
 			getUsageDataByLocation.call(this);
 		}
 
 		// getMaxData();
 
-		yScale.domain([0, d3.max(barData, function(d) {
+		yScale.domain([0, d3.max(lineData, function(d) {
 			return d.dataUsage;
 		})]);
 			
-		/*clusterUsageChart.data(barData).transition()
+		/*clusterUsageChart.data(lineData).transition()
 			.attr('height', function(d) {
 				return yScale(d.dataUsage);
 			})
@@ -277,18 +278,18 @@ Author: Shoukath
 			})
 			.duration(700)
 			.ease('circle');*/
-		path.datum(barData)
+		path.datum(lineData)
 			.transition()
 				.attr("d", area)
 				.duration(easeDuration)
 				.ease(easyType);
-		line.datum(barData)
+		line.datum(lineData)
 			.transition()
 				.attr("d", lineFunc)
 				.duration(easeDuration)
 				.ease(easyType);
 		
-		vGuideScale.domain([0, d3.max(barData, function(d) {
+		vGuideScale.domain([0, d3.max(lineData, function(d) {
 			return d.dataUsage;
 		})]);
 
