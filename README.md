@@ -2,7 +2,7 @@
 
 ### Installation
 
-You need Bower installed globally:
+Bower needs to be installed globally:
 
 ```sh
 $ npm install -g bower
@@ -22,6 +22,14 @@ This project uses a number of open source projects to work properly:
 * [D3] - Interative data-visualization library
 * [Underscore.js] - Programming helper library
 * [Twitter Bootstrap] - great UI boilerplate for modern web apps
+
+### Start the Application
+```sh
+npm start
+```
+
+### Opening in Browser
+Go to the URL: http://localhost:3000
 
 ### License
 ----

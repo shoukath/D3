@@ -6,4 +6,6 @@ var app = express();
 
 app.use(express.static(__dirname + '/'));
 
-app.listen(3001);
+app.listen(3000, function() {
+	console.log('Started at port 3000');
+});

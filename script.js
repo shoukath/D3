@@ -26,16 +26,15 @@ Author: Shoukath
 
 	var dataUsageChart = {
 		init: function() {
-			this.createCanvas();
+			this.createBlankCanvas();
+			this.setTooltip();
 			this.loadExternalData();
 		},
-		createCanvas: function() {
-			this.createTooltip();
-
+		createBlankCanvas: function() {
+			// Creating the SVG with the appropriate dimensions
 			svg = d3.select('#chart').append('svg')
 				.attr('width', width +  margin.left + margin.right)
-				.attr('height', height + margin.top + margin.bottom)
-				.call(tooltip);
+				.attr('height', height + margin.top + margin.bottom);
 		},
 		loadExternalData: function() {
 			d3.csv('./data/cluster-disk-util.csv', this.generateChart.bind(this));
@@ -43,20 +42,22 @@ Author: Shoukath
 		},
 		generateChart: function(data){
 
+			// Saving the raw data in a variable, so that the raw data could be used later
 			clusterMemoryUsageOriginalData = data;
 
+			// Formatting the raw data to D3 consumable data
 			lineDataAllRegions = lineData = this.createDataArray(clusterMemoryUsageOriginalData);
 
+			// Setting the Horizontal and Vertical Scales
 			this.createScales();
 
+			// Creating the Chart Content
 			this.generateChart_Line();
-
 			this.generateChart_Area();
-
 			this.generateChart_Point();
 
+			// Creating the Axes
 			this.generateChart_XAxis();
-
 			this.generateChart_YAxis();
 		},
 		createScales: function() {
@@ -105,14 +106,14 @@ Author: Shoukath
 				.enter().append("g")
 				.attr("class", "point")
 				.attr("transform", function(d, i) {
-					return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")"
+					return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")";
 				});
 
 			point.append("circle")
 				.attr("cx", 0)
 				.attr("cy", 0)
 				.attr("r", radius)
-				.attr("opacity", .5)
+				.attr("opacity", 0.5)
 				.attr("fill", "#B1C095")
 				.on('mouseover', function(d) {
 					tooltip.show(d);
@@ -240,7 +241,7 @@ Author: Shoukath
 			point.data(lineData)
 				.transition()
 				.attr("transform", function(d, i) {
-					return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")"
+					return "translate(" + (xScale(i) + margin.left) + "," + (height - yScale(d.dataUsage) + margin.top) + ")";
 				})
 				.duration(easeDuration)
 				.ease(easyType);
@@ -258,13 +259,14 @@ Author: Shoukath
 			$('.dropdown #dropdown-label').text(location);
 		},
 		/* 	Creating a tooltip for the bar chart */
-		createTooltip: function() {
+		setTooltip: function() {
 			tooltip = d3.tip()
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
 				.html(function(d) {
 					return ("<strong>Date:</strong> <span>"+d.date+"</span></br><strong>Data Usage:</strong> <span>"+d.dataUsage+"</span>");
 			});
+			svg.call(tooltip);
 		},
 		/* This function processes the cluster usage data to sum up the data usage per day and
 		formats it to be ready and charted by D3 */

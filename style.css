@@ -41,11 +41,10 @@
 }
 
 .d3-tip span {
-	color: red;
+	color: #B1C095;
 	line-height: 18px;
 	vertical-align: middle;
 }
-
 
 .axis path,
 .axis line {
